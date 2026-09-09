@@ -1,10 +1,13 @@
 import 'package:doctor_hunt/app/core/utils/app_style.dart';
 import 'package:doctor_hunt/app/core/widgets/custom_button.dart';
 import 'package:doctor_hunt/app/core/widgets/custom_stack_color.dart';
+import 'package:doctor_hunt/app/features/auth/presentation/controller/auth_cubit.dart';
+import 'package:doctor_hunt/app/features/auth/presentation/controller/auth_state.dart';
 import 'package:doctor_hunt/app/features/auth/presentation/widgets/bottom_sheet_widget.dart';
 import 'package:doctor_hunt/app/features/auth/presentation/screens/signup_screen.dart';
 import 'package:doctor_hunt/app/core/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../generated/assets.dart';
@@ -40,37 +43,64 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
-                     SizedBox(height: height*.12),
+                    SizedBox(height: height * .12),
                     Text(
                       'Welcome Back',
                       textAlign: TextAlign.center,
-                      style: AppTextStyles.heading1
+                      style: AppTextStyles.heading1,
                     ),
 
-                     SizedBox(height: height*.012),
+                    SizedBox(height: height * .012),
 
-                     Text(
+                    Text(
                       'You can search a course, apply course and find\n'
                       'scholarship for abroad studies',
                       textAlign: TextAlign.center,
-                      style:AppTextStyles.bodySmall
+                      style: AppTextStyles.bodySmall,
                     ),
 
-                     SizedBox(height: height*.07),
+                    SizedBox(height: height * .07),
 
                     Row(
                       children: [
                         Expanded(
-                          child: CustomButton(
-                            onTap: () {},
-                            textColor: AppColors.detailsText,
-                            icon: Image.asset(Assets.images.google.path,),
-                            borderColor: AppColors.white,
-                            text: "Google",
-                            color: AppColors.white,
+                          child: BlocConsumer<AuthCubit, AuthState>(
+                            listener: (context, state) {
+                             if( state is AuthSuccess ){
+                               context.go(AppRouter.home);
+                             }
+                             if (state is AuthError) {
+                               ScaffoldMessenger.of(context).showSnackBar(
+                                 SnackBar(
+                                   content: Text(state.msg),
+                                 ),
+                               );
+                             }
+                            },
+                            builder: (context, state) {
+                              return BlocBuilder<AuthCubit, AuthState>(
+                                builder: (context, state) {
+                                  return CustomButton(
+                                    onTap: () async {
+                                      context
+                                          .read<AuthCubit>()
+                                          .signInWithGoogle();
+                                    },
+
+                                    textColor: AppColors.detailsText,
+                                    icon: Image.asset(
+                                      Assets.images.google.path,
+                                    ),
+                                    borderColor: AppColors.white,
+                                    text: "Google",
+                                    color: AppColors.white,
+                                  );
+                                },
+                              );
+                            },
                           ),
                         ),
-                         SizedBox(width: width*.012),
+                        SizedBox(width: width * .012),
                         Expanded(
                           child: CustomButton(
                             onTap: () {},
@@ -87,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: height*.015),
+                    SizedBox(height: height * .015),
                     CustomTextField(
                       controller: emailController,
                       hint: "Email",
@@ -104,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       validator: (v) {},
                     ),
 
-                    SizedBox(height: height*.005),
+                    SizedBox(height: height * .005),
 
                     TextButton(
                       onPressed: () {
@@ -126,11 +156,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
 
-                     SizedBox(height: height*.08),
+                    SizedBox(height: height * .08),
                     CustomButton(
                       onTap: () {
                         context.go(AppRouter.bottomWidget);
-
                       },
                       textColor: AppColors.white,
                       borderColor: AppColors.primaryColor,

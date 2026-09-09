@@ -1,8 +1,10 @@
 import 'package:doctor_hunt/app/core/utils/app_style.dart';
 import 'package:doctor_hunt/app/core/widgets/custom_stack_color.dart';
-import 'package:doctor_hunt/app/features/auth/presentation/screens/login_screen.dart';
+import 'package:doctor_hunt/app/features/auth/presentation/controller/auth_cubit.dart';
+import 'package:doctor_hunt/app/features/auth/presentation/controller/auth_state.dart';
 import 'package:doctor_hunt/app/core/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../generated/assets.dart';
@@ -24,7 +26,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -44,38 +45,64 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                     SizedBox(height:height*.12 ),
-                     Text(
+                    SizedBox(height: height * .12),
+                    Text(
                       'Join us to start searching',
                       textAlign: TextAlign.center,
-                      style: AppTextStyles.heading2
+                      style: AppTextStyles.heading2,
                     ),
 
-                     SizedBox(height: height*.012),
+                    SizedBox(height: height * .012),
 
-                     Text(
+                    Text(
                       'You can search a course, apply course and find\n'
                       'scholarship for abroad studies',
                       textAlign: TextAlign.center,
-                      style: AppTextStyles.bodySmall
+                      style: AppTextStyles.bodySmall,
                     ),
 
-                     SizedBox(height: height*.07),
+                    SizedBox(height: height * .07),
 
                     Row(
                       children: [
                         Expanded(
-                          child: CustomButton(
-                            onTap: () {},
-                            textColor: AppColors.detailsText,
-                            icon: Image.asset(       Assets.images.google.path,
-                            ),
-                            borderColor: AppColors.white,
-                            text: "Google",
-                            color: AppColors.white,
+                          child: BlocConsumer<AuthCubit, AuthState>(
+                            listener: (context, state) {
+                              if (state is AuthSuccess) {
+                                context.go(AppRouter.home);
+                              }
+                              if (state is AuthError) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(state.msg),
+                                  ),
+                                );
+                              }
+                            },
+                            builder: (context, state) {
+                              return BlocBuilder<AuthCubit, AuthState>(
+                                builder: (context, state) {
+                                  return CustomButton(
+                                    onTap: () async {
+                                      context
+                                          .read<AuthCubit>()
+                                          .signInWithGoogle();
+                                    },
+
+                                    textColor: AppColors.detailsText,
+                                    icon: Image.asset(
+                                      Assets.images.google.path,
+                                    ),
+                                    borderColor: AppColors.white,
+                                    text: "Google",
+                                    color: AppColors.white,
+                                  );
+                                },
+                              );
+                            },
                           ),
                         ),
-                         SizedBox(width: width*.012),
+                        SizedBox(width: width * .012),
                         Expanded(
                           child: CustomButton(
                             onTap: () {},
@@ -148,18 +175,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ),
 
-                         SizedBox(width: width*.008),
+                        SizedBox(width: width * .008),
 
-                         Expanded(
+                        Expanded(
                           child: Text(
                             'I agree with the Terms of Service & Privacy Policy',
-                            style: AppTextStyles.bodySmall
+                            style: AppTextStyles.bodySmall,
                           ),
                         ),
                       ],
                     ),
 
-                     SizedBox(height:height*.08 ),
+                    SizedBox(height: height * .08),
                     CustomButton(
                       onTap: () {
                         context.go(AppRouter.bottomWidget);
@@ -169,11 +196,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       text: "Sign up",
                       color: AppColors.primaryColor,
                     ),
-                    SizedBox(height:height*.012 ),
+                    SizedBox(height: height * .012),
                     InkWell(
                       onTap: () {
                         context.go(AppRouter.login);
-
                       },
                       child: const Text(
                         'Have an account? Log in',

@@ -1,6 +1,10 @@
 import 'package:doctor_hunt/app/core/widgets/custom_stack_color.dart';
 import 'package:doctor_hunt/app/core/widgets/custom_text_field.dart';
+import 'package:doctor_hunt/app/features/auth/presentation/controller/auth_cubit.dart';
+import 'package:doctor_hunt/app/features/auth/presentation/controller/auth_state.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../generated/assets.dart';
 import '../../../../core/utils/app_colors.dart';
@@ -19,41 +23,30 @@ class HomeScreen extends StatelessWidget {
         children: [
           const CustomStackColor(),
           SingleChildScrollView(
-            padding: EdgeInsets.only(
-              bottom: height * .02,
-            ),
+            padding: EdgeInsets.only(bottom: height * .02),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AppHeader(),
-                SizedBox(
-                  height: height * .05,
-                ),
+                SizedBox(height: height * .05),
                 SectionTitle(
                   title: 'Live Doctors',
                   fontSize: width * .048,
                   horizontalPadding: width * .05,
                 ),
-                SizedBox(
-                  height: height * .015,
-                ),
+                SizedBox(height: height * .015),
                 SizedBox(
                   height: width * .42,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: 3,
                     itemBuilder: (context, index) {
-                      return LiveDoctorCard(
-                        image: doctorImages[index],
-                      );
+                      return LiveDoctorCard(image: doctorImages[index]);
                     },
                   ),
                 ),
 
-                SizedBox(
-                  height: height * .025,
-                ),
-
+                SizedBox(height: height * .025),
 
                 SizedBox(
                   height: width * .25,
@@ -69,10 +62,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
 
-                SizedBox(
-                  height: height * .03,
-                ),
-
+                SizedBox(height: height * .03),
 
                 SectionTitle(
                   title: 'Popular Doctor',
@@ -81,24 +71,18 @@ class HomeScreen extends StatelessWidget {
                   horizontalPadding: width * .05,
                 ),
 
-                SizedBox(
-                  height: height * .018,
-                ),
+                SizedBox(height: height * .018),
 
                 SizedBox(
                   height: width * .72,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.only(
-                      left: width * .05,
-                    ),
+                    padding: EdgeInsets.only(left: width * .05),
                     itemCount: 2,
                     itemBuilder: (context, index) {
                       return PopularDoctorCard(
                         image: popularDoctors[index],
-                        name: index == 0
-                            ? 'Dr. Fillerup Grab'
-                            : 'Dr. Blessing',
+                        name: index == 0 ? 'Dr. Fillerup Grab' : 'Dr. Blessing',
                         specialty: index == 0
                             ? 'Medicine Specialist'
                             : 'Dentist Specialist',
@@ -107,10 +91,8 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
 
-                SizedBox(
-                  height: height * .025,
-                ),
-                
+                SizedBox(height: height * .025),
+
                 SectionTitle(
                   title: 'Feature Doctor',
                   action: 'See all ›',
@@ -118,17 +100,13 @@ class HomeScreen extends StatelessWidget {
                   horizontalPadding: width * .05,
                 ),
 
-                SizedBox(
-                  height: height * .016,
-                ),
+                SizedBox(height: height * .016),
 
                 SizedBox(
                   height: width * .36,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.only(
-                      left: width * .05,
-                    ),
+                    padding: EdgeInsets.only(left: width * .05),
                     itemCount: featureDoctors.length,
                     itemBuilder: (context, index) {
                       final doctor = featureDoctors[index];
@@ -152,19 +130,14 @@ class HomeScreen extends StatelessWidget {
 }
 
 class AppHeader extends StatelessWidget {
-  const AppHeader({
-    super.key,
-
-  });
-
+  const AppHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
 
-    final TextEditingController searchController =
-    TextEditingController();
+    final TextEditingController searchController = TextEditingController();
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -182,63 +155,73 @@ class AppHeader extends StatelessWidget {
               horizontal: width * .032,
               vertical: height * .024,
             ),
-            child: Row(
-              mainAxisAlignment:
-              MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: height * .06,
-                    ),
+            child: BlocBuilder<AuthCubit, AuthState>(
+              builder: (context, state) {
+                if(state is AuthSuccess) {
+                  final String photo=state.photo;
+                  final String displayName=state.displayName;
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: height * .06),
 
-                    Text(
-                      'Hi Handwerker!',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: width * .048,
+                          Row(
+                            children: [
+                              Text(
+                                'Hi, ',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: width * .048,
+                                ),
+                              ),
+                              Text(
+                                displayName,
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: width * .048,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: height * .003),
+
+                          Text(
+                            'Find Your Doctor',
+                            style: TextStyle(
+                              color: AppColors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: width * .072,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
 
-                    SizedBox(
-                      height: height * .003,
-                    ),
-
-                    Text(
-                      'Find Your Doctor',
-                      style: TextStyle(
-                        color: AppColors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: width * .072,
+                      Container(
+                        width: width * .15,
+                        height: width * .15,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.white,
+                            width: width * .005,
+                          ),
+                          image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: NetworkImage(photo),
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-
-                Container(
-                  width: width * .15,
-                  height: width * .15,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.white,
-                      width: width * .005,
-                    ),
-                    image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: AssetImage(
-                        Assets.images.doc1.path,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+                    ],
+                  );
+                } else{return const SizedBox();}
+              },
             ),
           ),
         ),
-
 
         Positioned(
           left: width * .05,
@@ -246,14 +229,8 @@ class AppHeader extends StatelessWidget {
           bottom: -height * .018,
           child: CustomTextField(
             controller: searchController,
-            prefixicon: Icon(
-              Icons.search,
-              size: width * .06,
-            ),
-            sufixicon: Icon(
-              Icons.close,
-              size: width * .06,
-            ),
+            prefixicon: Icon(Icons.search, size: width * .06),
+            sufixicon: Icon(Icons.close, size: width * .06),
             borderColor: AppColors.white,
             hint: "Search...",
             validator: (v) {},
@@ -281,9 +258,7 @@ class SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: horizontalPadding,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       child: Row(
         children: [
           Text(
@@ -314,10 +289,7 @@ class SectionTitle extends StatelessWidget {
 class LiveDoctorCard extends StatelessWidget {
   final String image;
 
-  const LiveDoctorCard({
-    super.key,
-    required this.image,
-  });
+  const LiveDoctorCard({super.key, required this.image});
 
   @override
   Widget build(BuildContext context) {
@@ -327,70 +299,46 @@ class LiveDoctorCard extends StatelessWidget {
       height: width * .4,
       width: width * .4,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(
-          width * .018,
-        ),
+        borderRadius: BorderRadius.circular(width * .018),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(
-          width * .018,
-        ),
-        child: Image.asset(
-          image,
-          fit: BoxFit.cover,
-        ),
+        borderRadius: BorderRadius.circular(width * .018),
+        child: Image.asset(image, fit: BoxFit.cover),
       ),
     );
   }
 }
 
-
 class CategoryCard extends StatelessWidget {
   final Color color;
   final IconData icon;
 
-  const CategoryCard({
-    super.key,
-    required this.color,
-    required this.icon,
-  });
+  const CategoryCard({super.key, required this.color, required this.icon});
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
     return Padding(
-      padding: EdgeInsets.only(
-        left: width * .04,
-      ),
+      padding: EdgeInsets.only(left: width * .04),
       child: Container(
         height: width * .23,
         width: width * .21,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(
-            width * .02,
-          ),
+          borderRadius: BorderRadius.circular(width * .02),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              color,
-              color.withOpacity(.55),
-            ],
+            colors: [color, color.withOpacity(.55)],
           ),
         ),
         child: Center(
-          child: Icon(
-            icon,
-            color:AppColors.white,
-            size: width * .11,
-          ),
+          child: Icon(icon, color: AppColors.white, size: width * .11),
         ),
       ),
     );
   }
 }
-
 
 class PopularDoctorCard extends StatelessWidget {
   final String image;
@@ -410,14 +358,10 @@ class PopularDoctorCard extends StatelessWidget {
 
     return Container(
       width: width * .5,
-      margin: EdgeInsets.only(
-        right: width * .04,
-      ),
+      margin: EdgeInsets.only(right: width * .04),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(.85),
-        borderRadius: BorderRadius.circular(
-          width * .03,
-        ),
+        borderRadius: BorderRadius.circular(width * .03),
       ),
       child: Column(
         children: [
@@ -426,20 +370,13 @@ class PopularDoctorCard extends StatelessWidget {
             width: double.infinity,
             child: ClipRRect(
               borderRadius: BorderRadius.vertical(
-                top: Radius.circular(
-                  width * .03,
-                ),
+                top: Radius.circular(width * .03),
               ),
-              child: Image.asset(
-                image,
-                fit: BoxFit.cover,
-              ),
+              child: Image.asset(image, fit: BoxFit.cover),
             ),
           ),
 
-          SizedBox(
-            height: width * .03,
-          ),
+          SizedBox(height: width * .03),
 
           Text(
             name,
@@ -450,9 +387,7 @@ class PopularDoctorCard extends StatelessWidget {
             ),
           ),
 
-          SizedBox(
-            height: width * .008,
-          ),
+          SizedBox(height: width * .008),
 
           Text(
             specialty,
@@ -462,9 +397,7 @@ class PopularDoctorCard extends StatelessWidget {
             ),
           ),
 
-          SizedBox(
-            height: width * .01,
-          ),
+          SizedBox(height: width * .01),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -522,17 +455,11 @@ class FeatureDoctorCard extends StatelessWidget {
 
     return Container(
       width: width * .26,
-      margin: EdgeInsets.only(
-        right: width * .03,
-      ),
-      padding: EdgeInsets.all(
-        width * .02,
-      ),
+      margin: EdgeInsets.only(right: width * .03),
+      padding: EdgeInsets.all(width * .02),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(.8),
-        borderRadius: BorderRadius.circular(
-          width * .018,
-        ),
+        borderRadius: BorderRadius.circular(width * .018),
       ),
       child: Column(
         children: [
@@ -552,27 +479,18 @@ class FeatureDoctorCard extends StatelessWidget {
                 color: const Color(0xffF7C843),
               ),
 
-              Text(
-                ' $rating',
-                style: TextStyle(
-                  fontSize: width * .03,
-                ),
-              ),
+              Text(' $rating', style: TextStyle(fontSize: width * .03)),
             ],
           ),
 
-          SizedBox(
-            height: width * .01,
-          ),
+          SizedBox(height: width * .01),
 
           CircleAvatar(
             radius: width * .065,
             backgroundImage: AssetImage(image),
           ),
 
-          SizedBox(
-            height: width * .01,
-          ),
+          SizedBox(height: width * .01),
 
           Text(
             name,
@@ -584,9 +502,7 @@ class FeatureDoctorCard extends StatelessWidget {
             ),
           ),
 
-          SizedBox(
-            height: width * .015,
-          ),
+          SizedBox(height: width * .015),
 
           Text(
             price,
