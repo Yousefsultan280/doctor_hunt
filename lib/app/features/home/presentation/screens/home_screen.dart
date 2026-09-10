@@ -155,74 +155,162 @@ class AppHeader extends StatelessWidget {
               horizontal: width * .032,
               vertical: height * .024,
             ),
-            child: BlocBuilder<AuthCubit, AuthState>(
-              builder: (context, state) {
-                if(state is AuthSuccess) {
-                  final String photo=state.photo;
-                  final String displayName=state.displayName;
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: height * .06),
+            child:
 
-                          Row(
-                            children: [
-                              Text(
-                                'Hi, ',
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: width * .048,
-                                ),
-                              ),
-                              Text(
-                                displayName,
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: width * .048,
-                                ),
-                              ),
-                            ],
-                          ),
+              BlocBuilder<AuthCubit, AuthState>(
+          builder: (context, state) {
 
-                          SizedBox(height: height * .003),
+            if (state is! AuthGoogleSuccess) {
+              return const SizedBox();
+            }
 
-                          Text(
-                            'Find Your Doctor',
-                            style: TextStyle(
-                              color: AppColors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: width * .072,
-                            ),
-                          ),
-                        ],
-                      ),
+            final String displayName = state.displayName;
+            final String photoUrl = state.photo;
 
-                      Container(
-                        width: width * .15,
-                        height: width * .15,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.white,
-                            width: width * .005,
-                          ),
-                          image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: NetworkImage(photo),
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: height * .06,
+                    ),
+
+                    Row(
+                      children: [
+                        Text(
+                          'Hi, ',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: width * .048,
                           ),
                         ),
-                      ),
-                    ],
-                  );
-                } else{return const SizedBox();}
-              },
-            ),
-          ),
-        ),
 
+                        Text(
+                          displayName,
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: width * .048,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(
+                      height: height * .003,
+                    ),
+
+                    Text(
+                      'Find Your Doctor',
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: width * .072,
+                      ),
+                    ),
+                  ],
+                ),
+
+                Container(
+                  width: width * .15,
+                  height: width * .15,
+
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.white,
+                      width: width * .005,
+                    ),
+                  ),
+
+                  child: ClipOval(
+                    child: photoUrl != null &&
+                        photoUrl.isNotEmpty
+                        ? Image.network(
+                      photoUrl,
+                      fit: BoxFit.cover,
+                    )
+                        : Image.asset(
+                      Assets.images.myself.path,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+          )
+
+
+
+            // BlocBuilder<AuthCubit, AuthState>(
+            //   builder: (context, state) {
+            //     if(state is AuthGoogleSuccess) {
+            //       final String photo=state.photo;
+            //       final String displayName=state.displayName;
+            //       return Row(
+            //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //         children: [
+            //           Column(
+            //             crossAxisAlignment: CrossAxisAlignment.start,
+            //             children: [
+            //               SizedBox(height: height * .06),
+            //
+            //               Row(
+            //                 children: [
+            //                   Text(
+            //                     'Hi, ',
+            //                     style: TextStyle(
+            //                       color: Colors.white70,
+            //                       fontSize: width * .048,
+            //                     ),
+            //                   ),
+            //                   Text(
+            //                     displayName,
+            //                     style: TextStyle(
+            //                       color: Colors.white70,
+            //                       fontSize: width * .048,
+            //                     ),
+            //                   ),
+            //                 ],
+            //               ),
+            //
+            //               SizedBox(height: height * .003),
+            //
+            //               Text(
+            //                 'Find Your Doctor',
+            //                 style: TextStyle(
+            //                   color: AppColors.white,
+            //                   fontWeight: FontWeight.bold,
+            //                   fontSize: width * .072,
+            //                 ),
+            //               ),
+            //             ],
+            //           ),
+            //
+            //           Container(
+            //             width: width * .15,
+            //             height: width * .15,
+            //             decoration: BoxDecoration(
+            //               shape: BoxShape.circle,
+            //               border: Border.all(
+            //                 color: AppColors.white,
+            //                 width: width * .005,
+            //               ),
+            //               image: DecorationImage(
+            //                 fit: BoxFit.cover,
+            //                 image: NetworkImage(photo),
+            //               ),
+            //             ),
+            //           ),
+            //         ],
+            //       );
+            //     } else{return const SizedBox();}
+            //   },
+            ),
+
+          ),
         Positioned(
           left: width * .05,
           right: width * .05,

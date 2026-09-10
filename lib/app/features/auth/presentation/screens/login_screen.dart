@@ -66,16 +66,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         Expanded(
                           child: BlocConsumer<AuthCubit, AuthState>(
                             listener: (context, state) {
-                             if( state is AuthSuccess ){
-                               context.go(AppRouter.home);
-                             }
-                             if (state is AuthError) {
-                               ScaffoldMessenger.of(context).showSnackBar(
-                                 SnackBar(
-                                   content: Text(state.msg),
-                                 ),
-                               );
-                             }
+                              if (state is AuthGoogleSuccess) {
+                                context.go(AppRouter.home);
+                              }
+                              if (state is AuthGoogleError) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(state.msg)),
+                                );
+                              }
                             },
                             builder: (context, state) {
                               return BlocBuilder<AuthCubit, AuthState>(
@@ -122,7 +120,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: emailController,
                       hint: "Email",
                       borderColor: AppColors.primaryColor,
-                      validator: (v) {},
+                      validator: (v) {
+                        return null;
+                      },
                     ),
                     SizedBox(height: 15),
                     CustomTextField(
@@ -131,7 +131,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       sufixicon: Icon(Icons.remove_red_eye),
                       borderColor: AppColors.primaryColor,
                       obscureText: true,
-                      validator: (v) {},
+                      validator: (v) {
+                        return null;
+                      },
                     ),
 
                     SizedBox(height: height * .005),
@@ -157,14 +159,27 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
 
                     SizedBox(height: height * .08),
-                    CustomButton(
-                      onTap: () {
-                        context.go(AppRouter.bottomWidget);
+                    BlocConsumer<AuthCubit, AuthState>(
+                      listener: (context, state) {
+                        if(state is AuthLogInError){
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(state.msg)),
+                          );
+                        } else if(state is AuthLogInSuccess){
+                          context.go(AppRouter.bottomWidget);
+                        }
                       },
-                      textColor: AppColors.white,
-                      borderColor: AppColors.primaryColor,
-                      text: "Login",
-                      color: AppColors.primaryColor,
+                      builder: (context, state) {
+                        return CustomButton(
+                          onTap: () {
+                            context.read<AuthCubit>().login(email: emailController.text, password: passwordController.text);
+                          },
+                          textColor: AppColors.white,
+                          borderColor: AppColors.primaryColor,
+                          text: "Login",
+                          color: AppColors.primaryColor,
+                        );
+                      },
                     ),
                     const SizedBox(height: 12),
                     TextButton(
@@ -205,7 +220,9 @@ class _LoginScreenState extends State<LoginScreen> {
         controller: controller,
         borderColor: Colors.grey,
         hint: "Email",
-        validator: (v) {},
+        validator: (v) {
+          return null;
+        },
       ),
       buttonWidget: CustomButton(
         textColor: AppColors.white,
@@ -271,7 +288,9 @@ class _LoginScreenState extends State<LoginScreen> {
             borderColor: Colors.grey,
             hint: "New Password",
             sufixicon: Icon(Icons.remove_red_eye),
-            validator: (v) {},
+            validator: (v) {
+              return null;
+            },
           ),
           SizedBox(height: 15),
           CustomTextField(
@@ -279,7 +298,9 @@ class _LoginScreenState extends State<LoginScreen> {
             borderColor: Colors.grey,
             sufixicon: Icon(Icons.remove_red_eye),
             hint: "Confirm New Password",
-            validator: (v) {},
+            validator: (v) {
+              return null;
+            },
           ),
         ],
       ),
